@@ -1,0 +1,131 @@
+
+## <summary>policy for theo_agent</summary>
+
+########################################
+## <summary>
+##	Execute theo_agent_exec_t in the theo_agent domain.
+## </summary>
+## <param name="domain">
+## <summary>
+##	Domain allowed to transition.
+## </summary>
+## </param>
+#
+interface(`theo_agent_domtrans',`
+	gen_require(`
+		type theo_agent_t, theo_agent_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	domtrans_pattern($1, theo_agent_exec_t, theo_agent_t)
+')
+
+######################################
+## <summary>
+##	Execute theo_agent in the caller domain.
+## </summary>
+## <param name="domain">
+##	<summary>
+##	Domain allowed access.
+##	</summary>
+## </param>
+#
+interface(`theo_agent_exec',`
+	gen_require(`
+		type theo_agent_exec_t;
+	')
+
+	corecmd_search_bin($1)
+	can_exec($1, theo_agent_exec_t)
+')
+
+########################################
+## <summary>
+##      Read theo-agent config files.
+## </summary>
+## <param name="domain">
+##      Domain allowed to read the config files.
+## </param>
+#
+interface(`theo_agent_read_conf',`
+        gen_require(`
+                type theo_agent_config_t;
+        ')
+
+        allow $1 theo_agent_config_t:file { open read getattr };
+        allow $1 theo_agent_config_t:dir { search };
+')
+
+########################################
+## <summary>
+##      Read/Write theo-agent config files.
+## </summary>
+## <param name="domain">
+##      Domain allowed to read/write the config files.
+## </param>
+#
+interface(`theo_agent_rw_conf',`
+        gen_require(`
+                type theo_agent_config_t;
+        ')
+
+        allow $1 theo_agent_config_t:file rw_file_perms;
+')
+
+########################################
+## <summary>
+##      Read/Write theo-agent cache files.
+## </summary>
+## <param name="domain">
+##      Domain allowed to read/write the cache files.
+## </param>
+#
+interface(`theo_agent_readwrite_cache',`
+        gen_require(`
+                type theo_agent_cache_t;
+        ')
+
+        allow $1 theo_agent_cache_t:file { rw_file_perms create };
+        allow $1 theo_agent_cache_t:dir { rw_file_perms search add_name };
+')
+
+########################################
+## <summary>
+##      Grant all permission to theo-agent files.
+## </summary>
+## <param name="domain">
+##      Domain allowed to manage theo-agent files.
+## </param>
+#
+interface(`theo_agent_grant_all',`
+        gen_require(`
+                type theo_agent_cache_t;
+                type theo_agent_config_t;
+                type theo_agent_exec_t;
+        ')
+	manage_files_pattern($1, theo_agent_config_t, theo_agent_config_t)
+	manage_files_pattern($1, theo_agent_cache_t, theo_agent_cache_t)
+	manage_files_pattern($1, theo_agent_exec_t, theo_agent_exec_t)
+        allow $1 theo_agent_config_t:file { relabelto };
+        allow $1 theo_agent_cache_t:file { relabelto };
+        allow $1 theo_agent_exec_t:file { relabelto };
+        allow $1 theo_agent_config_t:dir { relabelto rmdir };
+        allow $1 theo_agent_cache_t:dir { relabelto rmdir };
+        allow $1 theo_agent_exec_t:dir { relabelto };
+')
+
+########################################
+## <summary>
+##      Allow associate theo-agent files.
+## </summary>
+#
+interface(`theo_agent_grant_associate',`
+        gen_require(`
+                type theo_agent_cache_t;
+                type theo_agent_config_t;
+                type theo_agent_exec_t;
+        ')
+	allow theo_agent_config_t fs_t:filesystem associate;
+	allow theo_agent_cache_t fs_t:filesystem associate;
+	allow theo_agent_exec_t fs_t:filesystem associate;
+')
