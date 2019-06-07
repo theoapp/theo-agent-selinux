@@ -44,7 +44,8 @@ make -f /usr/share/selinux/devel/Makefile theo_agent.pp || exit
 
 # Generate a man page off the installed module
 sepolicy manpage -p . -d theo_agent_t
-# Fixing the file context on /usr/sbin/theo-agent
-/sbin/restorecon -F -v /usr/sbin/theo-agent
-/sbin/restorecon -R -v /etc/theo-agent
-/sbin/restorecon -R -v /var/cache/theo-agent
+
+# Fixing the file context on theo-agent files and dirs
+/sbin/restorecon -F -v ${THEO_AGENT_EXEC:-/usr/sbin/theo-agent}
+/sbin/restorecon -R -v ${THEO_AGENT_CONFIG:-/etc/theo-agent}
+/sbin/restorecon -R -v ${THEO_AGENT_CACHE:-/var/cache/theo-agent}
