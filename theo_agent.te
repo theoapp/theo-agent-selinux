@@ -1,4 +1,4 @@
-policy_module(theo_agent, 1.0.0)
+policy_module(theo_agent, 1.0.1)
 
 require {
 	class tcp_socket name_connect;
